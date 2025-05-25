@@ -22,7 +22,7 @@
         font-size: 18px;
         width: 80px;
         text-align: center;
-        margin-bottom: 15px;
+        margin: 5px;
       }
 
       .timer {
@@ -39,51 +39,55 @@
     </style>
   </head>
   <body>
-    <h2>📚 CFA Timer</h2>
+    <h2>📚 CFA Revision Timer</h2>
 
+    <label for="hours">Hours :</label>
+    <input type="number" id="hours" value="1" min="0" max="12" />
     <label for="minutes">Minutes :</label>
-    <input type="number" id="minutes" value="25" min="1" max="180" />
+    <input type="number" id="minutes" value="0" min="0" max="59" />
     <br />
 
     <button onclick="startTimer()">▶️ Start</button>
-    <button onclick="stopTimer()">⏹️ Stop</button>
+    <button onclick="pauseTimer()">⏸️ Pause</button>
 
-    <div class="timer" id="display">25:00</div>
+    <div class="timer" id="display">01:00:00</div>
 
     <script>
       let timer;
-      let remainingTime;
-      let isRunning = false;
+      let remainingTime = 0;
+      let isPaused = false;
 
       function startTimer() {
-        const minutesInput = document.getElementById("minutes").value;
-        let duration = parseInt(minutesInput) * 60;
-
-        if (!isRunning) {
-          remainingTime = duration;
+        if (!isPaused) {
+          const hours = parseInt(document.getElementById("hours").value) || 0;
+          const minutes = parseInt(document.getElementById("minutes").value) || 0;
+          remainingTime = (hours * 60 * 60) + (minutes * 60);
         }
 
-        isRunning = true;
+        isPaused = false;
 
         timer = setInterval(() => {
-          const minutes = Math.floor(remainingTime / 60);
-          const seconds = remainingTime % 60;
-          document.getElementById("display").textContent =
-            `${minutes.toString().padStart(2, "0")}:${seconds
-              .toString()
-              .padStart(2, "0")}`;
-
-          if (--remainingTime < 0) {
+          if (remainingTime <= 0) {
             clearInterval(timer);
-            isRunning = false;
             document.getElementById("display").textContent = "⏰ Time's up!";
+            return;
           }
+
+          const hrs = Math.floor(remainingTime / 3600);
+          const mins = Math.floor((remainingTime % 3600) / 60);
+          const secs = remainingTime % 60;
+
+          document.getElementById("display").textContent =
+            `${hrs.toString().padStart(2, "0")}:${mins
+              .toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+
+          remainingTime--;
         }, 1000);
       }
 
-      function stopTimer() {
+      function pauseTimer() {
         clearInterval(timer);
-        isRunning = false;
+        isPaused = true;
       }
     </script>
   </body>
