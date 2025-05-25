@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Chapter Countdown</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #ffffff;
+        color: #003366;
+        text-align: center;
+        padding: 50px;
+      }
+
+      h2 {
+        font-size: 28px;
+        margin-bottom: 20px;
+      }
+
+      input {
+        padding: 10px;
+        font-size: 18px;
+        margin: 10px;
+      }
+
+      .countdown {
+        font-size: 48px;
+        margin-top: 30px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>📘 Countdown to This Goal</h2>
+    <label for="targetDate">Select your deadline:</label><br />
+    <input type="date" id="targetDate" onchange="calculateCountdown()" />
+    
+    <div class="countdown" id="countdown">Waiting for date...</div>
+
+    <script>
+      function calculateCountdown() {
+        const input = document.getElementById("targetDate").value;
+        if (!input) return;
+
+        const target = new Date(input + "T00:00:00").getTime();
+        const today = new Date().setHours(0,0,0,0);
+        const diffInMs = target - today;
+
+        const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+        const message =
+          diffInDays > 0
+            ? `${diffInDays} day${diffInDays === 1 ? "" : "s"} remaining`
+            : diffInDays === 0
+              ? "Today is the day! 🎯"
+              : `⏱ Deadline passed ${Math.abs(diffInDays)} day${Math.abs(diffInDays) === 1 ? "" : "s"} ago`;
+
+        document.getElementById("countdown").textContent = message;
+      }
+    </script>
+  </body>
+</html>
