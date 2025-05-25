@@ -1,117 +1,118 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>CFA Auto-Calendar</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 40px;
-      background: #f9f9f9;
-      color: #003366;
-    }
-    label, input, select, button {
-      display: block;
-      margin: 10px 0;
-      font-size: 16px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 30px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #003366;
-      color: white;
-    }
-  </style>
+    <title>Planificateur CFA Level 1</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; }
+        .form-group { margin: 15px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f5f5f5; }
+        .weekend { background-color: #fff3f3; }
+    </style>
 </head>
 <body>
-  <h2>📆 CFA Auto-Calendar Generator</h2>
+    <h1>Planificateur CFA Level 1</h1>
+    
+    <div class="form-group">
+        <label>Date d'examen:</label>
+        <input type="date" id="examDate" required>
+    </div>
+    
+    <div class="form-group">
+        <label>Date de début:</label>
+        <input type="date" id="startDate">
+    </div>
+    
+    <div class="form-group">
+        <label>Heures disponibles par jour:</label>
+        <input type="number" id="hoursPerDay" step="0.5" value="2.5">
+    </div>
+    
+    <div class="form-group">
+        <label>Jours off:</label><br>
+        <input type="checkbox" id="0"> Dimanche
+        <input type="checkbox" id="1"> Lundi
+        <input type="checkbox" id="2"> Mardi
+        <input type="checkbox" id="3"> Mercredi
+        <input type="checkbox" id="4"> Jeudi
+        <input type="checkbox" id="5"> Vendredi
+        <input type="checkbox" id="6"> Samedi
+    </div>
+    
+    <button onclick="generateSchedule()">Générer le planning</button>
+    
+    <div id="schedule"></div>
 
-  <form id="calendarForm">
-    <label>🗓 Date d'examen : <input type="date" id="examDate" required /></label>
-    <label>📅 Date de début (facultatif) : <input type="date" id="startDate" /></label>
-    <label>⏰ Heures disponibles par jour : <input type="number" id="hoursPerDay" min="1" value="2.5" /></label>
-    <label>❌ Jours off (ctrl/cmd+clic pour plusieurs) :
-      <select id="daysOff" multiple>
-        <option value="0">Dimanche</option>
-        <option value="1">Lundi</option>
-        <option value="2">Mardi</option>
-        <option value="3">Mercredi</option>
-        <option value="4">Jeudi</option>
-        <option value="5">Vendredi</option>
-        <option value="6">Samedi</option>
-      </select>
-    </label>
-    <button type="submit">Générer mon planning</button>
-  </form>
+    <script>
+        const modules = [
+            { name: 'Ethics and Trust in the Investment Profession', hours: 10.5 },
+            { name: 'Code of Ethics and Standards of Professional Conduct', hours: 10.5 },
+            { name: 'Guidance for Standards I–VII', hours: 10.5 },
+            { name: 'Introduction to the GIPS', hours: 10.5 },
+            { name: 'Ethics Application', hours: 10.5 },
+            { name: 'Rates and Returns', hours: 2.55 },
+            { name: 'Time Value of Money', hours: 2.55 },
+            { name: 'Statistical Measures of Asset Returns', hours: 2.55 },
+            { name: 'Probability Trees', hours: 2.55 },
+            { name: 'Portfolio Mathematics', hours: 2.55 },
+            { name: 'Simulation Methods', hours: 2.55 },
+            { name: 'Estimation and Inference', hours: 2.55 },
+            { name: 'Hypothesis Testing', hours: 2.55 },
+            { name: 'Independence Tests', hours: 2.55 },
+            { name: 'Simple Linear Regression', hours: 2.55 },
+            { name: 'Big Data Techniques', hours: 2.55 },
+            // Ajoute ici tous les autres modules comme ci-dessus
+        ];
 
-  <div id="calendarOutput"></div>
+        function generateSchedule() {
+            const examDate = new Date(document.getElementById('examDate').value);
+            const startDateInput = document.getElementById('startDate').value;
+            const startDate = startDateInput ? new Date(startDateInput) : new Date();
+            const hoursPerDay = parseFloat(document.getElementById('hoursPerDay').value);
+            const daysOff = [0,1,2,3,4,5,6].filter(d => document.getElementById(d).checked);
 
-  <script>
-    const modules = [
-      { title: "Rates and Returns", hours: 2.5 },
-      { title: "Time Value of Money", hours: 2.5 },
-      { title: "Statistical Measures", hours: 2.5 },
-      { title: "Ethics and Trust", hours: 10.5 },
-      { title: "Code of Ethics", hours: 10.5 },
-      { title: "Equity Valuation", hours: 5.5 },
-      // Tu peux coller ici tous les modules de df_chapter_hours si tu veux les 93 modules complets
-    ];
+            let schedule = '<table><tr><th>Date</th><th>Module</th><th>Temps estimé</th></tr>';
 
-    document.getElementById("calendarForm").addEventListener("submit", function (e) {
-      e.preventDefault();
+            let currentDate = new Date(startDate);
+            let moduleIndex = 0;
+            let moduleProgress = 0; // progress within current module
 
-      const examDate = new Date(document.getElementById("examDate").value);
-      const startDateInput = document.getElementById("startDate").value;
-      const startDate = startDateInput ? new Date(startDateInput) : new Date();
-      const hoursPerDay = parseFloat(document.getElementById("hoursPerDay").value);
-      const daysOff = Array.from(document.getElementById("daysOff").selectedOptions).map(opt => parseInt(opt.value));
+            while (currentDate <= examDate && moduleIndex < modules.length) {
+                if (!daysOff.includes(currentDate.getDay())) {
+                    let hoursLeft = hoursPerDay;
+                    let dayModules = '';
 
-      let currentDate = new Date(startDate);
-      const calendar = [];
-      let moduleIndex = 0;
+                    while (hoursLeft > 0 && moduleIndex < modules.length) {
+                        const module = modules[moduleIndex];
+                        const remaining = module.hours - moduleProgress;
 
-      while (currentDate <= examDate && moduleIndex < modules.length) {
-        if (!daysOff.includes(currentDate.getDay())) {
-          let availableHours = hoursPerDay;
-          let todayModules = [];
+                        if (hoursLeft >= remaining) {
+                            dayModules += `<strong>${module.name}</strong> (${remaining}h)<br>`;
+                            hoursLeft -= remaining;
+                            moduleIndex++;
+                            moduleProgress = 0;
+                        } else {
+                            dayModules += `<strong>${module.name}</strong> (${hoursLeft}h partiel)<br>`;
+                            moduleProgress += hoursLeft;
+                            hoursLeft = 0;
+                        }
+                    }
 
-          while (availableHours > 0 && moduleIndex < modules.length) {
-            const mod = modules[moduleIndex];
-            if (mod.hours <= availableHours) {
-              todayModules.push(mod);
-              availableHours -= mod.hours;
-              moduleIndex++;
-            } else {
-              break;
+                    if (dayModules) {
+                        schedule += `<tr><td>${currentDate.toISOString().split('T')[0]}</td><td>${dayModules}</td><td>${hoursPerDay - hoursLeft}</td></tr>`;
+                    }
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
             }
-          }
 
-          if (todayModules.length > 0) {
-            calendar.push({
-              date: currentDate.toISOString().split("T")[0],
-              modules: todayModules.map(m => m.title).join(", "),
-              total: hoursPerDay - availableHours
-            });
-          }
+            if (moduleIndex < modules.length) {
+                schedule += `<tr><td colspan="3" style="color:red">⚠️ Le planning ne couvre pas tous les modules.</td></tr>`;
+            }
+
+            schedule += '</table>';
+            document.getElementById('schedule').innerHTML = schedule;
         }
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-
-      let html = `<table><tr><th>Date</th><th>Modules</th><th>Durée estimée (h)</th></tr>`;
-      calendar.forEach(entry => {
-        html += `<tr><td>${entry.date}</td><td>${entry.modules}</td><td>${entry.total.toFixed(2)}</td></tr>`;
-      });
-      html += `</table>`;
-      document.getElementById("calendarOutput").innerHTML = html;
-    });
-  </script>
+    </script>
 </body>
 </html>
