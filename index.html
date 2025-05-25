@@ -2,50 +2,89 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>CFA Countdown</title>
+    <title>CFA Revision Timer</title>
     <style>
       body {
         font-family: Arial, sans-serif;
-        background: #ffffff;
+        background-color: #ffffff;
         color: #003366;
         text-align: center;
-        padding: 40px;
+        padding: 50px;
       }
+
       h2 {
         font-size: 28px;
         margin-bottom: 20px;
       }
-      .countdown {
-        font-size: 24px;
-        font-weight: bold;
+
+      input {
+        padding: 10px;
+        font-size: 18px;
+        width: 80px;
+        text-align: center;
+        margin-bottom: 15px;
+      }
+
+      .timer {
+        font-size: 36px;
+        margin: 20px 0;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        margin: 5px;
+        cursor: pointer;
       }
     </style>
   </head>
   <body>
-    <h2>🎓 CFA Exam Countdown</h2>
-    <div class="countdown" id="countdown">Loading...</div>
+    <h2>📚 CFA Timer</h2>
+
+    <label for="minutes">Minutes :</label>
+    <input type="number" id="minutes" value="25" min="1" max="180" />
+    <br />
+
+    <button onclick="startTimer()">▶️ Start</button>
+    <button onclick="stopTimer()">⏹️ Stop</button>
+
+    <div class="timer" id="display">25:00</div>
 
     <script>
-      const examDate = new Date("June 15, 2025 09:00:00").getTime();
+      let timer;
+      let remainingTime;
+      let isRunning = false;
 
-      const timer = setInterval(() => {
-        const now = new Date().getTime();
-        const distance = examDate - now;
+      function startTimer() {
+        const minutesInput = document.getElementById("minutes").value;
+        let duration = parseInt(minutesInput) * 60;
 
-        if (distance < 0) {
-          clearInterval(timer);
-          document.getElementById("countdown").innerHTML = "📘 Exam Started!";
-          return;
+        if (!isRunning) {
+          remainingTime = duration;
         }
 
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        isRunning = true;
 
-        document.getElementById("countdown").innerHTML =
-          `${days}d ${hours}h ${minutes}m ${seconds}s`;
-      }, 1000);
+        timer = setInterval(() => {
+          const minutes = Math.floor(remainingTime / 60);
+          const seconds = remainingTime % 60;
+          document.getElementById("display").textContent =
+            `${minutes.toString().padStart(2, "0")}:${seconds
+              .toString()
+              .padStart(2, "0")}`;
+
+          if (--remainingTime < 0) {
+            clearInterval(timer);
+            isRunning = false;
+            document.getElementById("display").textContent = "⏰ Time's up!";
+          }
+        }, 1000);
+      }
+
+      function stopTimer() {
+        clearInterval(timer);
+        isRunning = false;
+      }
     </script>
   </body>
 </html>
