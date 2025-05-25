@@ -1,24 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <title>CFA Countdown</title>
     <style>
       body {
         font-family: Arial, sans-serif;
-        background: #fff;
+        background: #ffffff;
         color: #003366;
         text-align: center;
-        padding: 10px;
+        padding: 40px;
+      }
+      h2 {
+        font-size: 28px;
+        margin-bottom: 20px;
       }
       .countdown {
         font-size: 24px;
-        margin-top: 20px;
+        font-weight: bold;
       }
     </style>
   </head>
   <body>
     <h2>🎓 CFA Exam Countdown</h2>
-    <div class="countdown" id="countdown"></div>
+    <div class="countdown" id="countdown">Loading...</div>
 
     <script>
       const examDate = new Date("June 15, 2025 09:00:00").getTime();
@@ -27,18 +32,19 @@
         const now = new Date().getTime();
         const distance = examDate - now;
 
+        if (distance < 0) {
+          clearInterval(timer);
+          document.getElementById("countdown").innerHTML = "📘 Exam Started!";
+          return;
+        }
+
         const days = Math.floor(distance / (1000 * 60 * 60 * 24));
         const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
         document.getElementById("countdown").innerHTML =
-          days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
-
-        if (distance < 0) {
-          clearInterval(timer);
-          document.getElementById("countdown").innerHTML = "📘 Exam Started!";
-        }
+          `${days}d ${hours}h ${minutes}m ${seconds}s`;
       }, 1000);
     </script>
   </body>
