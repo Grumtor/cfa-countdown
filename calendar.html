@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CFA Auto-Calendar</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background: #f9f9f9;
+      color: #003366;
+    }
+    label, input, select, button {
+      display: block;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #003366;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h2>📆 CFA Auto-Calendar Generator</h2>
+
+  <form id="calendarForm">
+    <label>🗓 Date d'examen : <input type="date" id="examDate" required /></label>
+    <label>📅 Date de début (facultatif) : <input type="date" id="startDate" /></label>
+    <label>⏰ Heures disponibles par jour : <input type="number" id="hoursPerDay" min="1" value="2.5" /></label>
+    <label>❌ Jours off (ctrl/cmd+clic pour plusieurs) :
+      <select id="daysOff" multiple>
+        <option value="0">Dimanche</option>
+        <option value="1">Lundi</option>
+        <option value="2">Mardi</option>
+        <option value="3">Mercredi</option>
+        <option value="4">Jeudi</option>
+        <option value="5">Vendredi</option>
+        <option value="6">Samedi</option>
+      </select>
+    </label>
+    <button type="submit">Générer mon planning</button>
+  </form>
+
+  <div id="calendarOutput"></div>
+
+  <script>
+    const modules = [
+      { title: "Rates and Returns", hours: 2.5 },
+      { title: "Time Value of Money", hours: 2.5 },
+      { title: "Statistical Measures", hours: 2.5 },
+      { title: "Ethics and Trust", hours: 10.5 },
+      { title: "Code of Ethics", hours: 10.5 },
+      { title: "Equity Valuation", hours: 5.5 },
+      // Tu peux coller ici tous les modules de df_chapter_hours si tu veux les 93 modules complets
+    ];
+
+    document.getElementById("calendarForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const examDate = new Date(document.getElementById("examDate").value);
+      const startDateInput = document.getElementById("startDate").value;
+      const startDate = startDateInput ? new Date(startDateInput) : new Date();
+      const hoursPerDay = parseFloat(document.getElementById("hoursPerDay").value);
+      const daysOff = Array.from(document.getElementById("daysOff").selectedOptions).map(opt => parseInt(opt.value));
+
+      let currentDate = new Date(startDate);
+      const calendar = [];
+      let moduleIndex = 0;
+
+      while (currentDate <= examDate && moduleIndex < modules.length) {
+        if (!daysOff.includes(currentDate.getDay())) {
+          let availableHours = hoursPerDay;
+          let todayModules = [];
+
+          while (availableHours > 0 && moduleIndex < modules.length) {
+            const mod = modules[moduleIndex];
+            if (mod.hours <= availableHours) {
+              todayModules.push(mod);
+              availableHours -= mod.hours;
+              moduleIndex++;
+            } else {
+              break;
+            }
+          }
+
+          if (todayModules.length > 0) {
+            calendar.push({
+              date: currentDate.toISOString().split("T")[0],
+              modules: todayModules.map(m => m.title).join(", "),
+              total: hoursPerDay - availableHours
+            });
+          }
+        }
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      let html = `<table><tr><th>Date</th><th>Modules</th><th>Durée estimée (h)</th></tr>`;
+      calendar.forEach(entry => {
+        html += `<tr><td>${entry.date}</td><td>${entry.modules}</td><td>${entry.total.toFixed(2)}</td></tr>`;
+      });
+      html += `</table>`;
+      document.getElementById("calendarOutput").innerHTML = html;
+    });
+  </script>
+</body>
+</html>
